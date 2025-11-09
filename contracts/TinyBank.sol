@@ -40,6 +40,18 @@ contract TinyBank is ManagedAccess {
         rewardPerBlock = _amount;
     }
 
+    // who, when?
+    modifier updateReward(address to) {
+        if (staked[to] > 0) {
+            uint256 blocks = block.number - lastClaimedBlock[to];
+            uint256 reward = (blocks * rewardPerBlock * staked[to]) /
+                totalStaked;
+            stakingToken.mint(reward, to);
+        }
+        lastClaimedBlock[to] = block.number;
+        _; // caller's code
+    }
+
     function stake(uint256 _amount) external updateReward(msg.sender) {
         require(_amount >= 0, "cannot stake 0 amount");
         stakingToken.transferFrom(msg.sender, address(this), _amount);
