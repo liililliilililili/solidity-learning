@@ -36,18 +36,6 @@ contract TinyBank is ManagedAccess {
         rewardPerBlock = defaultRewardPerBlock;
     }
 
-    // who, when?
-    modifier updateReward(address to) {
-        if (staked[to] > 0) {
-            uint256 blocks = block.number - lastClaimedBlock[to];
-            uint256 reward = (blocks * rewardPerBlock * staked[to]) /
-                totalStaked;
-            stakingToken.mint(reward, to);
-        }
-        lastClaimedBlock[to] = block.number;
-        _; // caller's code
-    }
-
     function setRewardPerBlock(uint256 _amount) external onlyManager {
         rewardPerBlock = _amount;
     }
